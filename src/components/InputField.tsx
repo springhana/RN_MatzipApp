@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React, {forwardRef, ForwardedRef, useRef} from 'react';
 import {
   Dimensions,
   Pressable,
@@ -8,7 +8,8 @@ import {
   View,
 } from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
-import {colors} from '../constants';
+import {colors} from '@/constants';
+import {mergeRefs} from '@/utils';
 
 interface InputFieldProps extends TextInputProps {
   disabled?: boolean;
@@ -18,41 +19,43 @@ interface InputFieldProps extends TextInputProps {
 
 const deviceHeight = Dimensions.get('window').height;
 
-function InputField({
-  disabled = false,
-  error,
-  touched,
-  ...props
-}: InputFieldProps) {
-  const inputRef = useRef<TextInput | null>(null);
+const InputField = forwardRef(
+  (
+    {disabled = false, error, touched, ...props}: InputFieldProps,
+    ref?: ForwardedRef<TextInput>,
+  ) => {
+    const innerRef = useRef<TextInput | null>(null);
 
-  const handlePressInput = () => {
-    inputRef.current?.focus();
-  };
+    const handlePressInput = () => {
+      innerRef.current?.focus();
+    };
 
-  return (
-    <Pressable onPress={handlePressInput}>
-      <View
-        style={[
-          styles.container,
-          disabled && styles.disabled,
-          touched && Boolean(error) && styles.inputError,
-        ]}>
-        <TextInput
-          ref={inputRef}
-          editable={!disabled}
-          placeholderTextColor={colors.GRAY_500}
-          style={[styles.input, disabled && styles.disabled]}
-          autoCapitalize="none" // 자동 대문자
-          spellCheck={false} // 스펠 체크
-          autoCorrect={false}
-          {...props}
-        />
-        {touched && Boolean(error) && <Text style={styles.error}>{error}</Text>}
-      </View>
-    </Pressable>
-  );
-}
+    return (
+      <Pressable onPress={handlePressInput}>
+        <View
+          style={[
+            styles.container,
+            disabled && styles.disabled,
+            touched && Boolean(error) && styles.inputError,
+          ]}>
+          <TextInput
+            ref={ref ? mergeRefs(innerRef, ref) : innerRef}
+            editable={!disabled}
+            placeholderTextColor={colors.GRAY_500}
+            style={[styles.input, disabled && styles.disabled]}
+            autoCapitalize="none" // 자동 대문자
+            spellCheck={false} // 스펠 체크
+            autoCorrect={false}
+            {...props}
+          />
+          {touched && Boolean(error) && (
+            <Text style={styles.error}>{error}</Text>
+          )}
+        </View>
+      </Pressable>
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   container: {
