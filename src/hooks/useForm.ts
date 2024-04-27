@@ -35,7 +35,7 @@ function useForm<T>({initialValue, validate}: UseFormProps<T>) {
   useEffect(() => {
     const newErrors = validate(values);
     setErros(newErrors);
-  }, [values]); //강의 에서는 validate도 의존성으로 들어가 있음
+  }, [values, validate]); //강의 에서는 validate도 의존성으로 들어가 있음
 
   return {values, errors, touched, getTextInputProps};
 }
