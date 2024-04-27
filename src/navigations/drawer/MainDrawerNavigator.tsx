@@ -1,7 +1,7 @@
 import {createDrawerNavigator} from '@react-navigation/drawer';
-import MapHomeScreen from '../../screens/map/MapHomeScreen';
-import FeedHomeScreen from '../../screens/feed/FeedHomeScreen';
-import CalendarHomeScreen from '../../screens/calender/CalendarHomeScreen';
+import MapHomeScreen from '@/screens/map/MapHomeScreen';
+import FeedHomeScreen from '@/screens/feed/FeedHomeScreen';
+import CalendarHomeScreen from '@/screens/calender/CalendarHomeScreen';
 
 const Drawer = createDrawerNavigator();
 
