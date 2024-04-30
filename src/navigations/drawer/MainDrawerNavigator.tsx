@@ -39,7 +39,7 @@ function DrawerIcons(route: RouteProp<MainDrawerParamList>, focused: boolean) {
     <MaterialIcons
       name={iconName}
       size={18}
-      color={focused ? colors.BKACK : colors.GRAY_500}
+      color={focused ? colors.BLACK : colors.GRAY_500}
     />
   );
 }
@@ -55,7 +55,7 @@ function MainDrawerNavigator() {
           width: Dimensions.get('screen').width * 0.6,
           backgroundColor: colors.WHITE,
         },
-        drawerActiveTintColor: colors.BKACK,
+        drawerActiveTintColor: colors.BLACK,
         drawerInactiveTintColor: colors.GRAY_500,
         drawerActiveBackgroundColor: colors.PINK_200,
         drawerInactiveBackgroundColor: colors.GRAY_100,
