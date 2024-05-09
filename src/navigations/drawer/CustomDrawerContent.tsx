@@ -1,4 +1,4 @@
-import {StyleSheet, View, Text, Image} from 'react-native';
+import {StyleSheet, View, Text, Image, Pressable} from 'react-native';
 
 import {colors} from '@/constants';
 import useAuth from '@/hooks/queries/useAuth';
@@ -10,15 +10,19 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 function CustomDrawerContent(props: DrawerContentComponentProps) {
-  const {getProfileQuery} = useAuth();
+  const {logoutMutation, getProfileQuery} = useAuth();
   const {email, nickname, imageUri, kakaoImageUri} = getProfileQuery.data || {};
+
+  const handleLogout = () => {
+    logoutMutation.mutate(null);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <DrawerContentScrollView
         {...props}
         scrollEnabled={false}
-        contentContainerStyle={styles.cotentContainer}>
+        contentContainerStyle={styles.contentContainer}>
         <View style={styles.userInfoContainer}>
           <View style={styles.userImageContainer}>
             {imageUri === null && kakaoImageUri === null && (
@@ -36,8 +40,16 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
           </View>
           <Text style={styles.nameText}>{nickname ?? email}</Text>
         </View>
-
         <DrawerItemList {...props} />
+
+        <Pressable
+          onPress={handleLogout}
+          style={{
+            alignItems: 'flex-end',
+            padding: 10,
+          }}>
+          <Text>로그아웃</Text>
+        </Pressable>
       </DrawerContentScrollView>
     </SafeAreaView>
   );
@@ -47,11 +59,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  cotentContainer: {
+  contentContainer: {
     backgroundColor: colors.WHITE,
   },
   nameText: {
-    color: colors.BKACK,
+    color: colors.BLACK,
   },
   userInfoContainer: {
     alignItems: 'center',
