@@ -14,7 +14,7 @@ import {
   UseQueryCustomOptions,
 } from '@/types/common';
 import {removeEncryptStorage, setEncryptStorage} from '@/utils';
-import {removeHeader, setHeadere} from '@/utils/header';
+import {removeHeader, setHeadere} from '@/utils';
 import queryClient from '@/api/queryClient';
 import {numbers, queryKeys, storageKeys} from '@/constants';
 
