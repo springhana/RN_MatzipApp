@@ -1,11 +1,5 @@
-import {useEffect} from 'react';
-import {
-  View,
-  Text,
-  SafeAreaView,
-  StyleSheet,
-  ScrollView,
-} from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {View, Text, SafeAreaView, StyleSheet, ScrollView} from 'react-native';
 import Octicons from 'react-native-vector-icons/Octicons';
 
 import {colors, mapNavigations} from '@/constants';
@@ -13,7 +7,6 @@ import {MapStackParamList} from '@/navigations/stack/MapStackNavigator';
 import {StackScreenProps} from '@react-navigation/stack';
 import InputField from '@/components/InputField';
 import CustomButton from '@/components/CustomButton';
-import {useRef, useState} from 'react';
 import {TextInput} from 'react-native-gesture-handler';
 import useForm from '@/hooks/useForm';
 import {getDateWithSeparator, validateAddPost} from '@/utils';
@@ -92,7 +85,7 @@ function AddPostScreen({route, navigation}: AddPostScreenProps) {
     navigation.setOptions({
       headerRight: () => AddPostHeaderRight(handleSubmit),
     });
-  }, []);
+  }, [handleSubmit, navigation]);
 
   return (
     <SafeAreaView style={styles.container}>
