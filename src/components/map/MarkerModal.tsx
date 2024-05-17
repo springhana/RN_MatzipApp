@@ -9,7 +9,7 @@ import {
   Pressable,
   Platform,
 } from 'react-native';
-import CustomMarker from './CustomMarker';
+import CustomMarker from '../common/CustomMarker';
 import Octicons from 'react-native-vector-icons/Octicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
