@@ -25,5 +25,51 @@ const getPost = async (id: number): Promise<ResponseSinglePost> => {
   return data;
 };
 
-export {createPost, getPost, getPosts};
-export type {ResponsePost, RequestCreatePost, ResponseSinglePost};
+const deletePost = async (id: number) => {
+  const {data} = await axiosInstance.delete(`/posts/${id}`);
+
+  return data;
+};
+
+type RequestUpdatePost = {
+  id: number;
+  body: Omit<Post, 'id' | 'longitude' | 'latitude' | 'address'> & {
+    imageUris: ImageUri[];
+  };
+};
+
+const updatePost = async ({
+  id,
+  body,
+}: RequestUpdatePost): Promise<ResponseSinglePost> => {
+  const {data} = await axiosInstance.patch(`/posts/${id}`, body);
+
+  return data;
+};
+
+const getFavoritePosts = async (page = 1): Promise<ResponsePost[]> => {
+  const {data} = await axiosInstance.get(`/favorites/my?page=${page}`);
+
+  return data;
+};
+const updateFavoritePost = async (id: number): Promise<number> => {
+  const {data} = await axiosInstance.post(`/favorites/${id}`);
+
+  return data;
+};
+
+export {
+  createPost,
+  getPost,
+  getPosts,
+  deletePost,
+  updatePost,
+  updateFavoritePost,
+  getFavoritePosts,
+};
+export type {
+  ResponsePost,
+  RequestCreatePost,
+  ResponseSinglePost,
+  RequestUpdatePost,
+};
