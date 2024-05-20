@@ -1,18 +1,18 @@
+import {Dimensions} from 'react-native';
 import {createDrawerNavigator} from '@react-navigation/drawer';
-import {NavigatorScreenParams} from '@react-navigation/native';
+import {NavigatorScreenParams, RouteProp} from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import FeedHomeScreen from '@/screens/feed/FeedHomeScreen';
+
+import CustomDrawerContent from './CustomDrawerContent';
 import CalendarHomeScreen from '@/screens/calender/CalendarHomeScreen';
+import FeedTabNavigator, {FeedTabParamList} from '../tab/FeedTabNavigator';
 import MapStackNavigator, {MapStackParamList} from '../stack/MapStackNavigator';
 import {colors, mainNavigations} from '@/constants';
-import {RouteProp} from '@react-navigation/native';
-import {Dimensions} from 'react-native';
-import CustomDrawerContent from './CustomDrawerContent';
-import FeedStackNavigator from '../stack/FeedStackNavigator';
+import FeedHomeHeaderLeft from '@/components/feed/FeedHomeHeaderLeft';
 
 export type MainDrawerParamList = {
   [mainNavigations.HOME]: NavigatorScreenParams<MapStackParamList>;
-  [mainNavigations.FEED]: undefined;
+  [mainNavigations.FEED]: NavigatorScreenParams<FeedTabParamList>;
   [mainNavigations.CALENDAR]: undefined;
 };
 
@@ -39,8 +39,8 @@ function DrawerIcons(route: RouteProp<MainDrawerParamList>, focused: boolean) {
   return (
     <MaterialIcons
       name={iconName}
-      size={18}
       color={focused ? colors.BLACK : colors.GRAY_500}
+      size={18}
     />
   );
 }
@@ -75,15 +75,22 @@ function MainDrawerNavigator() {
       />
       <Drawer.Screen
         name={mainNavigations.FEED}
-        component={FeedStackNavigator}
-        options={{title: '피드'}}
+        component={FeedTabNavigator}
+        options={{
+          title: '피드',
+        }}
       />
       <Drawer.Screen
         name={mainNavigations.CALENDAR}
         component={CalendarHomeScreen}
-        options={{title: '캘린더'}}
+        options={({navigation}) => ({
+          title: '캘린더',
+          headerShown: true,
+          headerLeft: () => FeedHomeHeaderLeft(navigation),
+        })}
       />
     </Drawer.Navigator>
   );
 }
+
 export default MainDrawerNavigator;
