@@ -11,10 +11,7 @@ type ResponseError = AxiosError<{
   error: string;
 }>;
 
-type UseMutationOptionsCustomOptions<
-  TData = unknown,
-  TVariables = unknown,
-> = Omit<
+type UseMutationCustomOptions<TData = unknown, TVariables = unknown> = Omit<
   UseMutationOptions<TData, ResponseError, TVariables, unknown>,
   'mutationFn'
 >;
@@ -24,8 +21,4 @@ type UseQueryCustomOptions<TQueryFnData = unknown, TData = TQueryFnData> = Omit<
   'queryKey'
 >;
 
-export type {
-  ResponseError,
-  UseMutationOptionsCustomOptions,
-  UseQueryCustomOptions,
-};
+export type {ResponseError, UseMutationCustomOptions, UseQueryCustomOptions};
