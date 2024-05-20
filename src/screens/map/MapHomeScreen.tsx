@@ -1,4 +1,4 @@
-import {useRef, useState} from 'react';
+import {useState} from 'react';
 import {StyleSheet, Pressable, View, Alert} from 'react-native';
 import MapView, {
   Callout,
@@ -20,10 +20,11 @@ import useUserLocation from '@/hooks/useUserLocation';
 import usePermission from '@/hooks/usePermission';
 import CustomMarker from '@/components/common/CustomMarker';
 import mapStyle from '@/style/mapStyle';
-import {alerts, colors, mapNavigations} from '@/constants';
+import {alerts, colors, mapNavigations, numbers} from '@/constants';
 import useGetMarkers from '@/hooks/queries/useGetMarkers';
 import useModal from '@/hooks/useModal';
 import MarkerModal from '@/components/map/MarkerModal';
+import useMoveMapView from '@/hooks/useMoveMapView';
 
 type Navigation = CompositeNavigationProp<
   StackNavigationProp<MapStackParamList>,
@@ -33,21 +34,14 @@ type Navigation = CompositeNavigationProp<
 function MapHomeScreen() {
   const inset = useSafeAreaInsets();
   const navigation = useNavigation<Navigation>();
-  const mapRef = useRef<MapView | null>(null);
   const {userLocation, isUserLocationError} = useUserLocation();
   const [selectLocation, setSelectLocation] = useState<LatLng | null>();
   const [markerId, setMarkerId] = useState<number | null>(null);
   const {data: markers = []} = useGetMarkers();
+  const {mapRef, moveMapView, handleChangeDelta} = useMoveMapView();
   const markerModal = useModal();
-  usePermission('LOCATION');
 
-  const moveMapView = (coordinate: LatLng) => {
-    mapRef.current?.animateToRegion({
-      ...coordinate,
-      longitudeDelta: 0.0922,
-      latitudeDelta: 0.0421,
-    });
-  };
+  usePermission('LOCATION');
 
   const handlePressMarker = (id: number, coordinate: LatLng) => {
     moveMapView(coordinate);
@@ -93,10 +87,10 @@ function MapHomeScreen() {
         showsMyLocationButton={true}
         customMapStyle={mapStyle}
         onLongPress={handleLongPressMapView}
+        onRegionChangeComplete={handleChangeDelta}
         region={{
           ...userLocation,
-          longitudeDelta: 0.0922,
-          latitudeDelta: 0.0421,
+          ...numbers.INITIAL_DELTA,
         }}>
         {markers.map(({id, color, score, ...coordinate}) => (
           <CustomMarker
