@@ -13,9 +13,19 @@ import CustomMarker from '../common/CustomMarker';
 import Octicons from 'react-native-vector-icons/Octicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
-import {colors} from '@/constants';
+import {
+  colors,
+  feedNavigations,
+  feedTabNavigations,
+  mainNavigations,
+} from '@/constants';
 import useGetPost from '@/hooks/queries/useGetPost';
 import {getDateWithSeparator} from '@/utils';
+import {CompositeNavigationProp, useNavigation} from '@react-navigation/native';
+import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
+import {DrawerNavigationProp} from '@react-navigation/drawer';
+import {MainDrawerParamList} from '@/navigations/drawer/MainDrawerNavigator';
+import {FeedTabParamList} from '@/navigations/tab/FeedTabNavigator';
 
 interface MarkerModalProps {
   markerId: number | null;
@@ -23,17 +33,38 @@ interface MarkerModalProps {
   hide: () => void;
 }
 
+type Navigation = CompositeNavigationProp<
+  DrawerNavigationProp<MainDrawerParamList>,
+  BottomTabNavigationProp<FeedTabParamList>
+>;
+
 const MarkerModal = ({markerId, isVisible, hide}: MarkerModalProps) => {
+  const navigation = useNavigation<Navigation>();
   const {data: post, isPending, isError} = useGetPost(markerId);
 
   if (isPending || isError) {
     return <></>;
   }
 
+  const handlePressModal = () => {
+    navigation.navigate(mainNavigations.FEED, {
+      screen: feedTabNavigations.FEED_HOME,
+      params: {
+        screen: feedNavigations.FEED_DETAIL,
+        params: {
+          id: post.id,
+        },
+        initial: false,
+      },
+    });
+
+    hide();
+  };
+
   return (
     <Modal visible={isVisible} transparent={true} animationType="slide">
       <SafeAreaView style={styles.optionBackground} onTouchEnd={hide}>
-        <Pressable style={styles.cardContainer} onPress={() => {}}>
+        <Pressable style={styles.cardContainer} onPress={handlePressModal}>
           <View style={styles.cardInner}>
             <View style={styles.cardAlign}>
               {post.images.length > 0 && (
@@ -43,9 +74,9 @@ const MarkerModal = ({markerId, isVisible, hide}: MarkerModalProps) => {
                     source={{
                       uri: `${
                         Platform.OS === 'ios'
-                          ? 'http://localhost:3030/'
-                          : 'http://10.0.2.2:3030/'
-                      }${post.images[0]?.uri}`,
+                          ? 'http://localhost:3030'
+                          : 'http://192.168.68.52:3030'
+                      }/${post.images[0]?.uri}`,
                     }}
                     resizeMode="cover"
                   />
