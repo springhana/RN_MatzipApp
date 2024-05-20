@@ -9,23 +9,20 @@ import {
   postLogin,
   postSignup,
 } from '@/api/auth';
-import {
-  UseMutationOptionsCustomOptions,
-  UseQueryCustomOptions,
-} from '@/types/common';
+import {UseMutationCustomOptions, UseQueryCustomOptions} from '@/types/common';
 import {removeEncryptStorage, setEncryptStorage} from '@/utils';
 import {removeHeader, setHeadere} from '@/utils';
 import queryClient from '@/api/queryClient';
 import {numbers, queryKeys, storageKeys} from '@/constants';
 
-function useSignup(mutaionOptions?: UseMutationOptionsCustomOptions) {
+function useSignup(mutaionOptions?: UseMutationCustomOptions) {
   return useMutation({
     mutationFn: postSignup,
     ...mutaionOptions,
   });
 }
 
-function useLogin(mutaionOptions?: UseMutationOptionsCustomOptions) {
+function useLogin(mutaionOptions?: UseMutationCustomOptions) {
   return useMutation({
     mutationFn: postLogin,
     onSuccess: ({accessToken, refreshToken}) => {
@@ -79,7 +76,7 @@ function useGetProfile(queryOptions?: UseQueryCustomOptions<ResponseProfile>) {
   });
 }
 
-function useLogout(mutationOptions?: UseMutationOptionsCustomOptions) {
+function useLogout(mutationOptions?: UseMutationCustomOptions) {
   return useMutation({
     mutationFn: logout,
     onSuccess: () => {
