@@ -68,7 +68,7 @@ function usePermission(type: PermissionType) {
           break;
       }
     })();
-  });
+  }, []);
 }
 
 export default usePermission;
