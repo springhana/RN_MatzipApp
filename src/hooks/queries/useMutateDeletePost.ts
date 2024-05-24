@@ -22,7 +22,11 @@ function useMutateDeletePost(mutationOptions?: UseMutationCustomOptions) {
           return existingMarkers?.filter(marker => marker.id !== deleteId);
         },
       );
+      queryClient.invalidateQueries({
+        queryKey: [queryKeys.POST, queryKeys.GET_CALENDAR_POSTS],
+      });
     },
+
     ...mutationOptions,
   });
 }
