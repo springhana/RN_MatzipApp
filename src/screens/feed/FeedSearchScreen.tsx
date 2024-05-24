@@ -9,6 +9,7 @@ import {ThemeMode} from '@/types';
 function FeedSearchScreen() {
   const {theme} = useThemeStore();
   const styles = styling(theme);
+
   return (
     <SafeAreaView style={styles.container}>
       <FeedSearchList />
