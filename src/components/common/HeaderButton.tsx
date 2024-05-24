@@ -1,4 +1,6 @@
 import {colors} from '@/constants';
+import useThemeStore from '@/store/useThemeStore';
+import {ThemeMode} from '@/types';
 import {ReactNode} from 'react';
 import {StyleSheet, Pressable, PressableProps, Text} from 'react-native';
 
@@ -14,6 +16,9 @@ function HeaderButton({
   hasError = false,
   ...props
 }: HeaderButtonProps) {
+  const {theme} = useThemeStore();
+  const styles = styling(theme);
+  
   return (
     <Pressable disabled={hasError} style={styles.container} {...props}>
       {!labelText && icon}
@@ -26,22 +31,23 @@ function HeaderButton({
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    height: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 10,
-  },
-  text: {
-    fontSize: 15,
-    fontWeight: '500',
-    color: colors.PINK_700,
-  },
-  textError: {
-    color: colors.GRAY_200,
-  },
-});
+const styling = (theme: ThemeMode) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      height: '100%',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: 10,
+    },
+    text: {
+      fontSize: 15,
+      fontWeight: '500',
+      color: colors[theme].PINK_700,
+    },
+    textError: {
+      color: colors[theme].GRAY_200,
+    },
+  });
 
 export default HeaderButton;

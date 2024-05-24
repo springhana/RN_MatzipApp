@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {FlatList, StyleSheet, View, Text} from 'react-native';
 import FeedItem from './FeedItem';
 import useGetInfiiniteFavoritePosts from '@/hooks/queries/useGetInfiniteFavoritePosts';
+import useThemeStore from '@/store/useThemeStore';
 
 function FeedFavoriteList() {
   const {
@@ -11,6 +12,7 @@ function FeedFavoriteList() {
     isFetchingNextPage,
     refetch,
   } = useGetInfiiniteFavoritePosts();
+  const {theme} = useThemeStore();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleRefresh = async () => {
@@ -42,7 +44,7 @@ function FeedFavoriteList() {
       refreshing={isRefreshing}
       onRefresh={handleRefresh}
       scrollIndicatorInsets={{right: 1}} // 스크롤 바 위치
-      indicatorStyle="black"
+      indicatorStyle={theme === 'dark' ? 'white' : 'black'}
     />
   );
 }

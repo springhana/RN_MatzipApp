@@ -26,6 +26,7 @@ import useImagePicker from '@/hooks/useImagePicker';
 import PreviewImageList from '@/components/common/PreviewImageList';
 import useDetailStore from '@/store/useDetailPostStore';
 import useMutateUpdatePost from '@/hooks/queries/useMutateUpdatePost';
+import useThemeStore from '@/store/useThemeStore';
 
 interface PostFromProps {
   isEdit?: boolean;
@@ -33,6 +34,7 @@ interface PostFromProps {
 }
 
 function PostFrom({location, isEdit = false}: PostFromProps) {
+  const {theme} = useThemeStore();
   const navigation = useNavigation<StackNavigationProp<FeedStackParamList>>();
   const descriptionRef = useRef<TextInput | null>(null);
   const createPost = useMutateCreatePost();
@@ -120,7 +122,11 @@ function PostFrom({location, isEdit = false}: PostFromProps) {
             value={address}
             disabled
             icon={
-              <Octicons name="location" size={16} color={colors.GRAY_500} />
+              <Octicons
+                name="location"
+                size={16}
+                color={colors[theme].GRAY_500}
+              />
             }
           />
           <CustomButton

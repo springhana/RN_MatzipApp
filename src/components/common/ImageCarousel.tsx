@@ -14,8 +14,10 @@ import Octicons from 'react-native-vector-icons/Octicons';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 import {colors} from '@/constants';
-import {ImageUri} from '@/types';
+import {ImageUri, ThemeMode} from '@/types';
 import {useNavigation} from '@react-navigation/core';
+import Config from 'react-native-config';
+import useThemeStore from '@/store/useThemeStore';
 
 interface ImageCarouselProps {
   images: ImageUri[];
@@ -25,6 +27,8 @@ interface ImageCarouselProps {
 const deviceWidth = Dimensions.get('window').width;
 
 function ImageCarousel({images, pressedIndex = 0}: ImageCarouselProps) {
+  const {theme} = useThemeStore();
+  const styles = styling(theme);
   const inset = useSafeAreaInsets();
   const navigation = useNavigation();
   const [page, setPage] = useState(pressedIndex);
@@ -41,7 +45,7 @@ function ImageCarousel({images, pressedIndex = 0}: ImageCarouselProps) {
       <Pressable
         style={[styles.backButton, {marginTop: inset.top + 10}]}
         onPress={() => navigation.goBack()}>
-        <Octicons name="arrow-left" size={30} color={colors.WHITE} />
+        <Octicons name="arrow-left" size={30} color={colors[theme].WHITE} />
       </Pressable>
       <FlatList
         data={images}
@@ -53,7 +57,7 @@ function ImageCarousel({images, pressedIndex = 0}: ImageCarouselProps) {
                 uri: `${
                   Platform.OS === 'ios'
                     ? 'http://localhost:3030'
-                    : 'http://192.168.68.52:3030'
+                    : Config.IPCONFIG
                 }/${item.uri}`,
               }}
               resizeMode="contain"
@@ -88,42 +92,43 @@ function ImageCarousel({images, pressedIndex = 0}: ImageCarouselProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    backgroundColor: colors.WHITE,
-  },
-  backButton: {
-    position: 'absolute',
-    left: 20,
-    zIndex: 1,
-    backgroundColor: colors.PINK_700,
-    width: 40,
-    height: 40,
-    borderRadius: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-  },
-  pageContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    position: 'absolute',
-  },
-  pageDot: {
-    margin: 4,
-    backgroundColor: colors.GRAY_200,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  currentPageDot: {
-    backgroundColor: colors.PINK_700,
-  },
-});
+const styling = (theme: ThemeMode) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      alignItems: 'center',
+      backgroundColor: colors[theme].WHITE,
+    },
+    backButton: {
+      position: 'absolute',
+      left: 20,
+      zIndex: 1,
+      backgroundColor: colors[theme].PINK_700,
+      width: 40,
+      height: 40,
+      borderRadius: 40,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    image: {
+      width: '100%',
+      height: '100%',
+    },
+    pageContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      position: 'absolute',
+    },
+    pageDot: {
+      margin: 4,
+      backgroundColor: colors[theme].GRAY_200,
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+    },
+    currentPageDot: {
+      backgroundColor: colors[theme].PINK_700,
+    },
+  });
 
 export default ImageCarousel;
