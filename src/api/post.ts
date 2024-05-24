@@ -75,6 +75,17 @@ const getCalendarPost = async (
   return data;
 };
 
+const getSearchPosts = async (
+  page = 1,
+  query: string,
+): Promise<ResponsePost[]> => {
+  const {data} = await axiosInstance.get(
+    `/posts/my/search?query=${query}&page=${page}`,
+  );
+
+  return data;
+};
+
 export {
   createPost,
   getPost,
@@ -84,6 +95,7 @@ export {
   updateFavoritePost,
   getFavoritePosts,
   getCalendarPost,
+  getSearchPosts,
 };
 export type {
   ResponsePost,
