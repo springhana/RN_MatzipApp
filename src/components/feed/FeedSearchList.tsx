@@ -45,12 +45,14 @@ function FeedSearchList() {
   return (
     <FlatList
       data={posts?.pages.flat()}
+      refreshing={isRefreshing}
+      onRefresh={handleRefresh}
       renderItem={({item}) => <FeedItem post={item} />}
       keyExtractor={item => String(item.id)}
       numColumns={2}
       scrollIndicatorInsets={{right: 1}}
       contentContainerStyle={styles.contentContainer}
-      indicatorStyle={'black'}
+      indicatorStyle={theme === 'dark' ? 'white' : 'black'}
       ListHeaderComponent={
         <View style={styles.headerContainer}>
           <Pressable
