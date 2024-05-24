@@ -11,8 +11,9 @@ import FeedStackNavigator from '../stack/FeedStackNavigator';
 import FeedFavoriteScreen from '@/screens/feed/FeedFavoriteScreen';
 import FeedHomeHeaderLeft from '@/components/feed/FeedHomeHeaderLeft';
 import {colors, feedNavigations, feedTabNavigations} from '@/constants';
-import useThemeStore from '@/store/useThemeStore';
 import FeedSearchScreen from '@/screens/feed/FeedSearchScreen';
+import useThemeStore from '@/store/useThemeStore';
+import {ThemeMode} from '@/types';
 
 export type FeedTabParamList = {
   [feedTabNavigations.FEED_HOME]: {
@@ -26,8 +27,11 @@ export type FeedTabParamList = {
 
 const Tab = createBottomTabNavigator<FeedTabParamList>();
 
-function TabBarIcons(route: RouteProp<FeedTabParamList>, focused: boolean) {
-  const {theme} = useThemeStore();
+function TabBarIcons(
+  route: RouteProp<FeedTabParamList>,
+  focused: boolean,
+  theme: ThemeMode,
+) {
   let iconName = '';
 
   switch (route.name) {
@@ -37,6 +41,10 @@ function TabBarIcons(route: RouteProp<FeedTabParamList>, focused: boolean) {
     }
     case feedTabNavigations.FEED_FAVORITE: {
       iconName = focused ? 'star' : 'star-outline';
+      break;
+    }
+    case feedTabNavigations.FEED_SEARCH: {
+      iconName = 'search';
       break;
     }
   }
@@ -71,7 +79,7 @@ function FeedTabNavigator() {
           borderTopColor: colors[theme].GRAY_200,
           borderTopWidth: StyleSheet.hairlineWidth,
         },
-        tabBarIcon: ({focused}) => TabBarIcons(route, focused),
+        tabBarIcon: ({focused}) => TabBarIcons(route, focused, theme),
       })}>
       <Tab.Screen
         name={feedTabNavigations.FEED_HOME}
