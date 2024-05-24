@@ -1,11 +1,11 @@
-import {useState, useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {SafeAreaView, StyleSheet} from 'react-native';
 
-import Calendar from '@/components/calendar/Calendar';
-import {colors} from '@/constants';
-import {getMonthYearDetails, getNewMonthYear} from '@/utils';
 import useGetCalendarPosts from '@/hooks/queries/useGetCalendarPosts';
+import Calendar from '@/components/calendar/Calendar';
 import EventList from '@/components/calendar/EventList';
+import {getMonthYearDetails, getNewMonthYear} from '@/utils';
+import {colors} from '@/constants';
 import {ThemeMode} from '@/types';
 import useThemeStore from '@/store/useThemeStore';
 
@@ -39,6 +39,7 @@ function CalendarHomeScreen() {
   };
 
   const handleUpdateMonth = (increment: number) => {
+    setSelectedDate(0);
     setMonthYear(prev => getNewMonthYear(prev, increment));
   };
 
@@ -47,9 +48,9 @@ function CalendarHomeScreen() {
       <Calendar
         monthYear={monthYear}
         schedules={posts}
-        onChangeMonth={handleUpdateMonth}
         selectedDate={selectedDate}
         onPressDate={handlePressDate}
+        onChangeMonth={handleUpdateMonth}
         moveToToday={moveToToday}
       />
       <EventList posts={posts[selectedDate]} />
@@ -57,11 +58,11 @@ function CalendarHomeScreen() {
   );
 }
 
-const styling = (thmem: ThemeMode) =>
+const styling = (theme: ThemeMode) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: colors[thmem].WHITE,
+      backgroundColor: colors[theme].WHITE,
     },
   });
 
