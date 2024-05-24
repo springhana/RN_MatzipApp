@@ -1,4 +1,5 @@
 import DarkModeOption from '@/components/setting/DarkModeOption';
+import MapLegendOption from '@/components/setting/MapLegendOption';
 import SettingItem from '@/components/setting/SettingItem';
 import {colors, settingNavigations} from '@/constants';
 import useAuth from '@/hooks/queries/useAuth';
@@ -6,7 +7,7 @@ import useModal from '@/hooks/useModal';
 import {SettingStackParamList} from '@/navigations/stack/SettingStackNavigator';
 import useThemeStore from '@/store/useThemeStore';
 import {StackScreenProps} from '@react-navigation/stack';
-import {StyleSheet, Text, View, SafeAreaView, ScrollView} from 'react-native';
+import {StyleSheet, View, SafeAreaView, ScrollView} from 'react-native';
 import Octicons from 'react-native-vector-icons/Octicons';
 
 type SettingHomeScreenProps = StackScreenProps<SettingStackParamList>;
@@ -15,6 +16,7 @@ function SettingHomeScreen({navigation}: SettingHomeScreenProps) {
   const {theme} = useThemeStore();
   const {logoutMutation} = useAuth();
   const darkModeOption = useModal();
+  const mapLegendOption = useModal();
 
   const handlePressEditProfile = () => {
     navigation.navigate(settingNavigations.EDIT_PROFILE);
@@ -38,6 +40,7 @@ function SettingHomeScreen({navigation}: SettingHomeScreenProps) {
           onPress={handlePressEditCategory}
         />
         <SettingItem title="다크 모드" onPress={darkModeOption.show} />
+        <SettingItem title="범례 표시" onPress={mapLegendOption.show} />
         <View style={styles.space} />
         <SettingItem
           title="로그아웃"
@@ -55,6 +58,10 @@ function SettingHomeScreen({navigation}: SettingHomeScreenProps) {
         <DarkModeOption
           isVisible={darkModeOption.isVisible}
           hideOption={darkModeOption.hide}
+        />
+        <MapLegendOption
+          isVisible={mapLegendOption.isVisible}
+          hideOption={mapLegendOption.hide}
         />
       </ScrollView>
     </SafeAreaView>

@@ -1,3 +1,4 @@
+import {storageKeys} from '@/constants';
 import useThemeStore from '@/store/useThemeStore';
 import {ThemeMode} from '@/types';
 import {getEncryptStorage, setEncryptStorage} from '@/utils';
@@ -9,20 +10,21 @@ function useThemeStorage() {
   const {theme, isSystem, setTheme, setSystemTheme} = useThemeStore();
 
   const setMode = async (mode: ThemeMode) => {
-    await setEncryptStorage('themeMode', mode);
+    await setEncryptStorage(storageKeys.THEME_MODE, mode);
     setTheme(mode);
   };
 
   const setSystem = async (flag: boolean) => {
-    await setEncryptStorage('themeSystem', flag);
+    await setEncryptStorage(storageKeys.THEME_SYSTEM, flag);
     setSystemTheme(flag);
   };
 
   // 재실행 했을 경우 설정 정보를 가져오기 위해 useEffect 사용
   useEffect(() => {
     async () => {
-      const mode = (await getEncryptStorage('themeMode')) ?? 'light';
-      const systemMode = (await getEncryptStorage('themeSystem')) ?? 'false';
+      const mode = (await getEncryptStorage(storageKeys.THEME_MODE)) ?? 'light';
+      const systemMode =
+        (await getEncryptStorage(storageKeys.THEME_SYSTEM)) ?? 'false';
       const newMode = systemMode ? systemTheme : mode;
       setTheme(newMode);
       setSystemTheme(systemMode);
