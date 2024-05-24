@@ -1,12 +1,14 @@
+import {useRef} from 'react';
 import {View, SafeAreaView, StyleSheet} from 'react-native';
+import {TextInput} from 'react-native-gesture-handler';
+import Toast from 'react-native-toast-message';
 
 import InputField from '@/components/common/InputField';
 import useForm from '@/hooks/useForm';
 import CustomButton from '@/components/common/CustomButton';
 import {validateSignup} from '@/utils';
-import {useRef} from 'react';
-import {TextInput} from 'react-native-gesture-handler';
 import useAuth from '@/hooks/queries/useAuth';
+import {errorMessages} from '@/constants';
 
 function SignupScreen() {
   const passwordRef = useRef<TextInput | null>(null);
@@ -20,11 +22,21 @@ function SignupScreen() {
   const handleSubmit = async () => {
     const {email, password} = signup.values;
 
-    signupMutation.mutate(signup.values, {
-      onSuccess: () => {
-        loginMutation.mutate({email, password});
+    signupMutation.mutate(
+      {email, password},
+      {
+        onSuccess: () => {
+          loginMutation.mutate({email, password});
+        },
+        onError: error =>
+          Toast.show({
+            type: 'error',
+            text1: error.response?.data.message || errorMessages.UNEXPECT_ERROR,
+            position: 'bottom',
+            visibilityTime: 2000,
+          }),
       },
-    });
+    );
   };
 
   return (
