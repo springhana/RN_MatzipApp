@@ -32,6 +32,8 @@ import {ThemeMode} from '@/types';
 import getMapStyle from '@/style/mapStyle';
 import useLegendStorage from '@/hooks/useLegendStorage';
 import MapLegend from '@/components/map/MapLegend';
+import MarkerFilterOption from '@/components/map/MarkerFilterOption';
+import useMarkerFilterStorage from '@/hooks/useMarkerFilterStorage';
 
 type Navigation = CompositeNavigationProp<
   StackNavigationProp<MapStackParamList>,
@@ -46,10 +48,14 @@ function MapHomeScreen() {
   const {userLocation, isUserLocationError} = useUserLocation();
   const {selectLocation, setSelectLocation} = useLocationStore();
   const [markerId, setMarkerId] = useState<number | null>(null);
-  const {data: markers = []} = useGetMarkers();
+  const markerFilter = useMarkerFilterStorage();
+  const {data: markers = []} = useGetMarkers({
+    select: markerFilter.transformFilteredMarker,
+  });
   const {mapRef, moveMapView, handleChangeDelta} = useMoveMapView();
   const markerModal = useModal();
   const legend = useLegendStorage();
+  const filterOption = useModal();
   usePermission('LOCATION');
 
   const handlePressMarker = (id: number, coordinate: LatLng) => {
@@ -138,6 +144,13 @@ function MapHomeScreen() {
         <Pressable style={styles.mapButton} onPress={handlePressSearch}>
           <Ionicons name="search" color={colors[theme].WHITE} size={25} />
         </Pressable>
+        <Pressable style={styles.mapButton} onPress={filterOption.show}>
+          <Ionicons
+            name="options-outline"
+            color={colors[theme].WHITE}
+            size={25}
+          />
+        </Pressable>
         <Pressable style={styles.mapButton} onPress={handlePressUserLocation}>
           <MaterialIcons
             name="my-location"
@@ -146,13 +159,15 @@ function MapHomeScreen() {
           />
         </Pressable>
       </View>
-
       <MarkerModal
         markerId={markerId}
         isVisible={markerModal.isVisible}
         hide={markerModal.hide}
       />
-
+      <MarkerFilterOption
+        isVisible={filterOption.isVisible}
+        hideOption={filterOption.hide}
+      />
       {legend.isVisible && <MapLegend />}
     </>
   );

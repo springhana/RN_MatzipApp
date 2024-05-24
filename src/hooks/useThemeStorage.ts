@@ -21,15 +21,16 @@ function useThemeStorage() {
 
   // 재실행 했을 경우 설정 정보를 가져오기 위해 useEffect 사용
   useEffect(() => {
-    async () => {
+    (async () => {
       const mode = (await getEncryptStorage(storageKeys.THEME_MODE)) ?? 'light';
       const systemMode =
-        (await getEncryptStorage(storageKeys.THEME_SYSTEM)) ?? 'false';
+        (await getEncryptStorage(storageKeys.THEME_SYSTEM)) ?? false;
+
       const newMode = systemMode ? systemTheme : mode;
       setTheme(newMode);
       setSystemTheme(systemMode);
-    };
-  }, []);
+    })();
+  }, [setTheme, setSystemTheme, systemTheme]);
 
   return {theme, isSystem, setMode, setSystem};
 }
