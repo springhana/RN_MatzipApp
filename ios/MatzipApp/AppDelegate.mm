@@ -8,7 +8,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-  [GMSServices provideAPIKey:@"AIzaSyC2XgSAYkvPRnI9I4B0MgV0STnCvbgQqG8"];
+  [GMSServices provideAPIKey:@"AIzaSyD30G2DIRx_c73iPAegAi7OWSiV1jdZzkw"];
   self.moduleName = @"MatzipApp";
   // You can add your custom initial props in the dictionary below.
   // They will be passed down to the ViewController used by React Native.
