@@ -29,6 +29,7 @@ import {Category, Profile} from '@/types';
 function useSignup(mutaionOptions?: UseMutationCustomOptions) {
   return useMutation({
     mutationFn: postSignup,
+    throwOnError: error => Number(error.response?.status) >= 500,
     ...mutaionOptions,
   });
 }
@@ -51,6 +52,7 @@ function useLogin<T>(
         queryKey: [queryKeys.AUTH, queryKeys.GET_PROFILE],
       });
     },
+    throwOnError: error => Number(error.response?.status) >= 500,
     ...mutaionOptions,
   });
 }
