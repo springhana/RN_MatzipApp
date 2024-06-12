@@ -1,3 +1,4 @@
+import { Favorite } from 'src/favorite/favorite.entity';
 import { MarkerColor } from 'src/post/marker-color.enum';
 import { Post } from 'src/post/post.entity';
 import {
@@ -62,4 +63,10 @@ export class User extends BaseEntity {
 
   @Column({ nullable: true })
   hashedRefreshToken?: string;
+
+  @OneToMany(() => Post, (post) => post.user, { eager: false }) // eager 옵션을 주면 관계되어 있는 데이터를 함께 가져올 수 있다.
+  post: Post[];
+
+  @OneToMany(() => Favorite, (favorite) => favorite.user)
+  favorite: Favorite[];
 }
