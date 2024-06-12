@@ -6,19 +6,24 @@ import {
 import { CreatePostDto } from './dto/create-post.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './post.entity';
-import { Repository } from 'typeorm';
+import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
+import { User } from 'src/auth/user.entity';
+import { Image } from 'src/image/image.entity';
 
 @Injectable()
 export class PostService {
   constructor(
     @InjectRepository(Post)
     private postRepository: Repository<Post>,
+    @InjectRepository(Image)
+    private imageRepository: Repository<Image>,
   ) {}
 
-  async getAllMarkers() {
+  async getAllMarkers(user: User) {
     try {
       const markers = await this.postRepository
         .createQueryBuilder('post')
+        .where('post.userId = :userId', { userId: user.id })
         .select([
           'post.id',
           'post.latitude',
@@ -31,47 +36,71 @@ export class PostService {
       return markers;
     } catch (error) {
       console.log(error);
-
       throw new InternalServerErrorException(
         '마커를 가져오는 도중 에러가 발생했습니다.',
       );
     }
   }
 
-  async getPosts(page: number) {
-    const perPage = 10;
-    const offet = (page - 1) * perPage;
-
-    return this.postRepository
-      .createQueryBuilder('post') // post 테이블에서 가져오기
-      .orderBy('post.date', 'DESC') // 날짜별로 정렬 해서
-      .take(perPage) // 페이장당 개수
-      .skip(offet) // 계속 가져올 수 있게
-      .getMany(); // 포스트는 하나가 아니라 여러개
+  private getPostsWithOrderImages(posts: Post[]) {
+    return posts.map((post) => {
+      const { images, ...rest } = post;
+      const newImages = [...images].sort((a, b) => a.id - b.id);
+      return { ...rest, images: newImages };
+    });
   }
 
-  async getPostById(id: number) {
+  private async getPostsBaseQuery(
+    userId: number,
+  ): Promise<SelectQueryBuilder<Post>> {
+    return this.postRepository
+      .createQueryBuilder('post')
+      .leftJoinAndSelect('post.images', 'image')
+      .where('post.userId = :userId', { userId })
+      .orderBy('post.date', 'DESC');
+  }
+
+  async getMyPosts(page: number, user: User) {
+    const perPage = 10;
+    const offset = (page - 1) * perPage;
+    const queryBuilder = await this.getPostsBaseQuery(user.id);
+    const posts = await queryBuilder.take(perPage).skip(offset).getMany();
+
+    return this.getPostsWithOrderImages(posts);
+  }
+
+  async getPostById(id: number, user: User) {
     try {
       const foundPost = await this.postRepository
         .createQueryBuilder('post')
-        .where('post.id = :id', { id }) // 조건 주기
+        .leftJoinAndSelect('post.images', 'image')
+        .leftJoinAndSelect(
+          'post.favorites',
+          'favorite',
+          'favorite.userId = :userId',
+          { userId: user.id },
+        )
+        .where('post.userId = :userId', { userId: user.id })
+        .andWhere('post.id = :id', { id })
         .getOne();
 
       if (!foundPost) {
         throw new NotFoundException('존재하지 않는 피드입니다.');
       }
 
-      return foundPost;
+      const { favorites, ...rest } = foundPost;
+      const postWithIsFavorites = { ...rest, isFavorite: favorites.length > 0 };
+
+      return postWithIsFavorites;
     } catch (error) {
       console.log(error);
-
       throw new InternalServerErrorException(
         '장소를 가져오는 도중 에러가 발생했습니다.',
       );
     }
   }
 
-  async createPost(createPostDto: CreatePostDto) {
+  async createPost(createPostDto: CreatePostDto, user: User) {
     const {
       latitude,
       longitude,
@@ -93,31 +122,35 @@ export class PostService {
       description,
       date,
       score,
+      user,
     });
+    const images = imageUris.map((uri) => this.imageRepository.create(uri));
+    post.images = images;
 
     try {
+      await this.imageRepository.save(images);
       await this.postRepository.save(post);
     } catch (error) {
       console.log(error);
-
       throw new InternalServerErrorException(
         '장소를 추가하는 도중 에러가 발생했습니다.',
       );
     }
 
-    return post;
+    const { user: _, ...postWithoutUser } = post;
+    return postWithoutUser;
   }
 
-  async deletePost(id: number) {
+  async deletePost(id: number, user: User) {
     try {
       const result = await this.postRepository
         .createQueryBuilder('post')
         .delete()
         .from(Post)
-        .where('id = :id', { id })
+        .where('userId = :userId', { userId: user.id })
+        .andWhere('id = :id', { id })
         .execute();
 
-      // 결과가 만약 없다면
       if (result.affected === 0) {
         throw new NotFoundException('존재하지 않는 피드입니다.');
       }
@@ -125,7 +158,6 @@ export class PostService {
       return id;
     } catch (error) {
       console.log(error);
-
       throw new InternalServerErrorException(
         '장소를 삭제하는 도중 에러가 발생했습니다.',
       );
@@ -135,8 +167,9 @@ export class PostService {
   async updatePost(
     id: number,
     updatePostDto: Omit<CreatePostDto, 'latitude' | 'longitude' | 'address'>,
+    user: User,
   ) {
-    const post = await this.getPostById(id); // 만들어둔 getPostById로 아이디가 있는지 확인
+    const post = await this.getPostById(id, user);
     const { title, description, color, date, score, imageUris } = updatePostDto;
     post.title = title;
     post.description = description;
@@ -144,18 +177,69 @@ export class PostService {
     post.date = date;
     post.score = score;
 
-    // image module
+    const images = imageUris.map((uri) => this.imageRepository.create(uri));
+    post.images = images;
 
     try {
+      await this.imageRepository.save(images);
       await this.postRepository.save(post);
     } catch (error) {
       console.log(error);
-
       throw new InternalServerErrorException(
         '장소를 수정하는 도중 에러가 발생했습니다.',
       );
     }
 
     return post;
+  }
+
+  async getPostsByMonth(year: number, month: number, user: User) {
+    const posts = await this.postRepository
+      .createQueryBuilder('post')
+      .where('post.userId = :userId', { userId: user.id })
+      .andWhere('extract(year from post.date) = :year', { year })
+      .andWhere('extract(month from post.date) = :month', { month })
+      .select([
+        'post.id AS id',
+        'post.title AS title',
+        'post.address AS address',
+        'EXTRACT(DAY FROM post.date) AS date',
+      ])
+      .getRawMany();
+
+    const groupPostsByDate = posts.reduce((acc, post) => {
+      const { id, title, address, date } = post;
+
+      if (!acc[date]) {
+        acc[date] = [];
+      }
+      acc[date].push({ id, title, address });
+
+      return acc;
+    }, {});
+
+    return groupPostsByDate;
+  }
+
+  async searchMyPostsByTitleAndAddress(
+    query: string,
+    page: number,
+    user: User,
+  ) {
+    const perPage = 10;
+    const offset = (page - 1) * perPage;
+    const queryBuilder = await this.getPostsBaseQuery(user.id);
+    const posts = await queryBuilder
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where('post.title like :query', { query: `%${query}%` });
+          qb.orWhere('post.address like :query', { query: `%${query}%` });
+        }),
+      )
+      .skip(offset)
+      .take(perPage)
+      .getMany();
+
+    return this.getPostsWithOrderImages(posts);
   }
 }
